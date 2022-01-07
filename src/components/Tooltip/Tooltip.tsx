@@ -1,15 +1,30 @@
 import React, { FC, memo, useEffect, useState, useCallback, CSSProperties } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import { MotionDiv } from '@/Components';
 import { useParentScroll } from '@/Hooks';
-import { ITooltipProps } from './Tooltip.d';
+import { ITooltipProps, ETooltipPlace } from './Tooltip.d';
 import s from './Tooltip.module.scss';
 
 const ARROW_W = parseFloat(s.arrowW);
+
+const ANIM_IN = {
+  opacity: 1,
+};
+const ANIM_OUT = {
+  opacity: 0,
+};
+const ANIM_TRANSITION = {
+  type: 'spring',
+  duration: 1,
+  bounce: 0.35,
+};
 
 const Tooltip: FC<ITooltipProps> = ({
   className,
   style,
   children,
   anchorRef,
+  place = ETooltipPlace.RIGHT,
   offset = [0, 0],
   ...rest
 }) => {
@@ -37,10 +52,26 @@ const Tooltip: FC<ITooltipProps> = ({
       height: anchorH,
     } = anchorRef.current.getBoundingClientRect();
 
-    setCustomStyle({
-      left: `${anchorL + anchorW + offset[0] + ARROW_W}px`,
-      top: `${anchorT + anchorH / 2 + offset[1]}px`,
-    });
+    place === ETooltipPlace.TOP &&
+      setCustomStyle({
+        left: `${anchorL + anchorW / 2 + offset[0]}px`,
+        top: `${anchorT + offset[1] - ARROW_W}px`,
+      });
+    place === ETooltipPlace.RIGHT &&
+      setCustomStyle({
+        left: `${anchorL + anchorW + offset[0] + ARROW_W}px`,
+        top: `${anchorT + anchorH / 2 + offset[1]}px`,
+      });
+    place === ETooltipPlace.BOTTOM &&
+      setCustomStyle({
+        left: `${anchorL + anchorW / 2 + offset[0]}px`,
+        top: `${anchorT + anchorH + offset[1] + ARROW_W}px`,
+      });
+    place === ETooltipPlace.LEFT &&
+      setCustomStyle({
+        left: `${anchorL + offset[0] - ARROW_W}px`,
+        top: `${anchorT + anchorH / 2 + offset[1]}px`,
+      });
   }, []);
 
   // Re-calculate bounding rect when any parent is scrolled
@@ -59,13 +90,26 @@ const Tooltip: FC<ITooltipProps> = ({
   }, [handleShow, handleHide, handleBoundingRectChange]);
 
   return (
-    <>
+    <AnimatePresence>
       {show && (
-        <div className={`${s.tooltip} ${className}`} style={{ ...customStyle, ...style }} {...rest}>
+        <MotionDiv
+          className={`
+          ${s.tooltip} 
+          ${place === ETooltipPlace.TOP && s.topPlace}
+          ${place === ETooltipPlace.RIGHT && s.rightPlace}
+          ${place === ETooltipPlace.BOTTOM && s.bottomPlace}
+          ${place === ETooltipPlace.LEFT && s.leftPlace}
+          ${className}`}
+          style={{ ...customStyle, ...style }}
+          initial={ANIM_OUT}
+          animate={ANIM_IN}
+          exit={ANIM_OUT}
+          transition={ANIM_TRANSITION}
+          {...rest}>
           {children}
-        </div>
+        </MotionDiv>
       )}
-    </>
+    </AnimatePresence>
   );
 };
 
