@@ -5,4 +5,5 @@ export interface ITooltipProps {
   style?: React.CSSProperties;
   children?: ReactNode;
   anchorRef: RefObject<HTMLElement>;
+  offset?: number[]; // Left/Top offset
 }

@@ -1,6 +1,13 @@
+$arrow-width: 6;
+$light-color: #dddddd;
+
+:export {
+  arrowW: $arrow-width;
+}
+
 .tooltip {
   position: absolute;
-  width: 100px;
+  width: max-content;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,6 +15,20 @@
   border-radius: 5px;
   padding: 5px;
   box-sizing: border-box;
-  background-color: #dddddd;
+  background-color: $light-color;
   transform: translateY(-50%);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: $arrow-width + px;
+    height: $arrow-width + px;
+    border: 1px solid gray;
+    border-top-color: transparent;
+    border-right-color: transparent;
+    background: $light-color;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
 }

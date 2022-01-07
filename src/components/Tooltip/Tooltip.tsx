@@ -3,7 +3,16 @@ import { useParentScroll } from '@/Hooks';
 import { ITooltipProps } from './Tooltip.d';
 import s from './Tooltip.module.scss';
 
-const Tooltip: FC<ITooltipProps> = ({ className, style, children, anchorRef, ...rest }) => {
+const ARROW_W = parseFloat(s.arrowW);
+
+const Tooltip: FC<ITooltipProps> = ({
+  className,
+  style,
+  children,
+  anchorRef,
+  offset = [0, 0],
+  ...rest
+}) => {
   const [show, setShow] = useState(false);
   const [customStyle, setCustomStyle] = useState<Partial<CSSProperties>>({});
 
@@ -28,7 +37,10 @@ const Tooltip: FC<ITooltipProps> = ({ className, style, children, anchorRef, ...
       height: anchorH,
     } = anchorRef.current.getBoundingClientRect();
 
-    setCustomStyle({ left: `${anchorL + anchorW}px`, top: `${anchorT + anchorH / 2}px` });
+    setCustomStyle({
+      left: `${anchorL + anchorW + offset[0] + ARROW_W}px`,
+      top: `${anchorT + anchorH / 2 + offset[1]}px`,
+    });
   }, []);
 
   // Re-calculate bounding rect when any parent is scrolled
